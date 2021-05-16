@@ -13,7 +13,9 @@ import {
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDTO } from './dto/create-book.dto';
-import { ValidateObjectId } from './shared/pipes/validate-object-id.pipes';
+import { ValidateObjectId } from '../shared/pipes/validate-object-id.pipes';
+import { AuthGuard } from '@nestjs/passport';
+import { UseGuards } from '@nestjs/common';
 
 @Controller('books')
 export class BookController {
@@ -21,6 +23,7 @@ export class BookController {
 
   // Submit a book
   @Post('/')
+  @UseGuards(AuthGuard('jwt'))
   async addBook(@Res() res, @Body() createBookDTO: CreateBookDTO) {
     const newBook = await this.bookService.addBook(createBookDTO);
     return res.status(HttpStatus.OK).json({
@@ -47,10 +50,11 @@ export class BookController {
   }
 
   // Edit a particular book using ID
-  @Put('/edit')
+  @Put('/:bookID')
+  @UseGuards(AuthGuard('jwt'))
   async editBook(
     @Res() res,
-    @Query('bookID', new ValidateObjectId()) bookID,
+    @Param('bookID', new ValidateObjectId()) bookID,
     @Body() createBookDTO: CreateBookDTO,
   ) {
     const editedBook = await this.bookService.editBook(bookID, createBookDTO);
@@ -63,10 +67,11 @@ export class BookController {
     });
   }
   // Delete a book using ID
-  @Delete('/delete')
+  @Delete('/:bookID')
+  @UseGuards(AuthGuard('jwt'))
   async deleteBook(
     @Res() res,
-    @Query('bookID', new ValidateObjectId()) bookID,
+    @Param('bookID', new ValidateObjectId()) bookID,
   ) {
     const deletedBook = await this.bookService.deleteBook(bookID);
     if (!deletedBook) {

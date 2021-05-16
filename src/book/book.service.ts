@@ -9,7 +9,8 @@ export class BookService {
   constructor(@InjectModel('Book') private readonly bookModel: Model<Book>) {}
 
   async addBook(createBookDTO: CreateBookDTO): Promise<Book> {
-    const newBook = await new this.bookModel(createBookDTO);
+    // @ts-ignore
+    const newBook = await this.bookModel(createBookDTO);
     return newBook.save();
   }
 
